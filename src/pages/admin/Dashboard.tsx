@@ -48,7 +48,7 @@ export default function AdminDashboard() {
         const isAdminLocal = localStorage.getItem('isAdmin');
         if (!isAdminLocal) navigate('/admin/login');
       } else {
-        const adminEmails = ['dm8115589@gmail.com', 'klgadjenix@gmail.com'];
+        const adminEmails = (process.env.NEXT_PUBLIC_ADMIN_EMAILS || 'dm8115589@gmail.com,klgadjenix@gmail.com').split(',');
         if (!adminEmails.includes(u.email || '')) {
            const isAdminLocal = localStorage.getItem('isAdmin');
            if (!isAdminLocal) {
@@ -101,18 +101,47 @@ export default function AdminDashboard() {
     }
   };
 
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = error => reject(error);
+    });
+  };
+
   const handleFileUpload = async (file: File) => {
     setUploading(true);
+    console.log("Initiating Upload Sequence for:", file.name);
+    
     const formData = new FormData();
     formData.append('file', file);
+    
     try {
       const res = await fetch('/api/upload', { method: 'POST', body: formData });
       const data = await res.json();
-      if (data.url) return data.url;
-      throw new Error(data.error);
+      
+      if (res.ok && data.url) {
+        console.log("Cloud Upload Successful:", data.url);
+        return data.url;
+      }
+      
+      console.warn("Cloud Upload API failed or unconfigured. Proceeding with Memory-Link fallback...");
+      const base64 = await fileToBase64(file);
+      toast.info("Using Local Memory: Cloud configuration missing", {
+        description: "Image stored in record but not in persistent cloud storage."
+      });
+      return base64;
     } catch (err) {
-      toast.error("Upload Failed");
-      return null;
+      console.error("Upload Vector Error:", err);
+      try {
+        const base64 = await fileToBase64(file);
+        toast.info("Using Local Memory: Integration Node Offline");
+        return base64;
+      } catch (b64Err) {
+        toast.error("Upload Failed: Data Corruption");
+        return null;
+      }
     } finally {
       setUploading(false);
     }

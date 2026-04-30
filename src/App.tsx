@@ -181,7 +181,6 @@ const Navbar = () => {
           <nav className="hidden lg:flex items-center gap-8 mr-4 text-sm font-semibold text-muted-foreground">
             <Link to="/products" className="hover:text-primary transition-colors">Products</Link>
             <Link to="/compare" className="hover:text-primary transition-colors">Compare</Link>
-            <Link to="/admin/login" className="hover:text-primary transition-colors">Admin</Link>
           </nav>
 
           <div className="flex items-center gap-2">
@@ -229,7 +228,6 @@ const Navbar = () => {
                              { label: 'Home', path: '/', icon: Zap },
                              { label: 'Products', path: '/products', icon: Cpu },
                              { label: 'Comparison', path: '/compare', icon: Watch },
-                             { label: 'Admin Panel', path: '/admin/login', icon: User },
                            ].map((item) => (
                              <Link 
                                key={item.label}
@@ -314,6 +312,36 @@ const Footer = () => (
 );
 
 export default function App() {
+  const [keySequence, setKeySequence] = useState('');
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ignore if user is typing in an input or textarea
+      const activeElement = document.activeElement;
+      const isInput = activeElement?.tagName === 'INPUT' || activeElement?.tagName === 'TEXTAREA';
+      if (isInput) return;
+
+      const newSequence = (keySequence + e.key.toLowerCase()).slice(-8);
+      setKeySequence(newSequence);
+
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      timeoutRef.current = setTimeout(() => {
+        setKeySequence('');
+      }, 2000);
+
+      if (newSequence === 'gadjenix') {
+        window.location.href = '/admin/login';
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, [keySequence]);
+
   return (
     <Router>
       <div className="min-h-screen bg-background text-foreground selection:bg-primary/30">

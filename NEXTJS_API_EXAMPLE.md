@@ -17,7 +17,7 @@ export async function POST(request: Request) {
 
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-2.0-flash",
+      model: "gemini-flash-latest",
       contents: `Analyze the following natural language search query for a gadget store: "${query}".
       Extract the intent: category (Audio, Wearables, Accessories), brand, maxPrice, and a cleaned correctedQuery (fix typos like 'hedset' to 'headset').
       Return as JSON.`,

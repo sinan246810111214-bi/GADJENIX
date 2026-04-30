@@ -15,7 +15,8 @@ export default function AdminLogin() {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === 'admin123') {
+    const adminPass = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'admin123';
+    if (password === adminPass) {
       localStorage.setItem('isAdmin', 'true');
       toast.success("Identity Verified. Access Granted.");
       navigate('/admin/dashboard');
@@ -29,7 +30,8 @@ export default function AdminLogin() {
     const provider = new GoogleAuthProvider();
     try {
       const result = await signInWithPopup(auth, provider);
-      if (result.user.email === 'dm8115589@gmail.com') {
+      const adminEmails = (process.env.NEXT_PUBLIC_ADMIN_EMAILS || 'dm8115589@gmail.com,klgadjenix@gmail.com').split(',');
+      if (adminEmails.includes(result.user.email || '')) {
         toast.success("Admin Protocol Authorized");
         navigate('/admin/dashboard');
       } else {

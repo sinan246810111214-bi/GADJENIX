@@ -12,9 +12,8 @@ import { PAYMENT_CONFIG } from '@/lib/constants';
 import { toast } from 'sonner';
 import { db, OperationType, handleFirestoreError } from '@/lib/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { GoogleGenAI, Type } from "@google/genai";
-
-const ai = new GoogleGenAI({ apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY || '' });
+import { getGemini, GEMINI_MODEL } from "@/lib/gemini";
+import { Type } from "@google/genai";
 
 export default function Checkout() {
   const { items, getTotalPrice, clearCart } = useCart();
@@ -73,6 +72,7 @@ export default function Checkout() {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    console.log("File selected:", file?.name, file?.type, file?.size);
     if (file) {
       if (file.size > 5 * 1024 * 1024) {
         toast.error("Image too large. Max size is 5MB");
@@ -81,6 +81,7 @@ export default function Checkout() {
       setScreenshotFile(file);
       const url = URL.createObjectURL(file);
       setScreenshotPreview(url);
+      console.log("Screenshot preview generated:", url);
     }
   };
 
@@ -91,13 +92,14 @@ export default function Checkout() {
     const toastId = toast.loading("AI Verifying Payment Snapshot...");
 
     try {
+      const ai = getGemini();
       const base64Data = await fileToBase64(screenshotFile);
       const now = new Date();
       const currentDateTime = now.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
       const currentDay = now.toLocaleDateString('en-IN', { weekday: 'long', timeZone: 'Asia/Kolkata' });
       
       const response = await ai.models.generateContent({
-        model: "gemini-2.0-flash",
+        model: GEMINI_MODEL,
         contents: {
           parts: [
             {
@@ -119,7 +121,7 @@ export default function Checkout() {
               1. Status: Must be "Successful", "Completed", or "Done".
               2. Amount: Must match ₹${total} exactly.
               3. Recipient: Must be "lithuahmd432@okaxis".
-              4. Temporal Integrity: The transaction date and time on the screenshot MUST be within the last 15-30 minutes of the current time (${currentDateTime}). Old screenshots from previous days or hours must be REJECTED.
+              4. Temporal Integrity: The transaction date and time on the screenshot MUST be within the last 10 minutes of the current time (${currentDateTime}). Old screenshots from previous days or hours must be REJECTED.
               
               Return a JSON object with 'verified' (boolean) and 'reason' (short string in English explaining success or specific failure reason).`
             }
@@ -147,7 +149,11 @@ export default function Checkout() {
         toast.error(`Verification Failed: ${result.reason || "Invalid Payment Screen"}`, { id: toastId });
         return false;
       }
-    } catch (err) {
+    } catch (err: any) {
+      if (err.message === "GEMINI_API_KEY_MISSING") {
+        toast.error("AI node offline: Gemini API Key missing in System Settings", { id: toastId });
+        return false;
+      }
       console.error("AI Error:", err);
       toast.error("AI Node Failure: Could not analyze screenshot", { id: toastId });
       return false;
@@ -432,7 +438,10 @@ export default function Checkout() {
                            
                            <div className="relative group">
                               {!screenshotPreview ? (
-                                 <label className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-white/10 rounded-2xl cursor-pointer hover:bg-white/5 hover:border-primary/50 transition-all group-active:scale-[0.98]">
+                                 <label 
+                                   htmlFor="screenshot-upload"
+                                   className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-white/10 rounded-2xl cursor-pointer hover:bg-white/5 hover:border-primary/50 transition-all group-active:scale-[0.98]"
+                                 >
                                     <div className="flex flex-col items-center justify-center pt-5 pb-6 space-y-3">
                                        <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
                                           <Upload className="w-6 h-6" />
@@ -442,7 +451,13 @@ export default function Checkout() {
                                           <p className="text-[10px] text-slate-500 font-bold uppercase mt-1 tracking-widest">JPG, PNG up to 5MB</p>
                                        </div>
                                     </div>
-                                    <input type="file" className="hidden" accept="image/*" onChange={handleFileChange} />
+                                    <input 
+                                      id="screenshot-upload"
+                                      type="file" 
+                                      className="sr-only" 
+                                      accept="image/*" 
+                                      onChange={handleFileChange} 
+                                    />
                                  </label>
                               ) : (
                                  <div className="relative rounded-2xl overflow-hidden border-2 border-primary shadow-2xl shadow-primary/20">
