@@ -97,7 +97,7 @@ export default function Checkout() {
       const currentDay = now.toLocaleDateString('en-IN', { weekday: 'long', timeZone: 'Asia/Kolkata' });
       
       const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
+        model: "gemini-2.0-flash",
         contents: {
           parts: [
             {

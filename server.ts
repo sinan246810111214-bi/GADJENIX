@@ -38,9 +38,11 @@ async function startServer() {
       console.error("Resend initialization error:", e);
     }
 
-    const geminiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY || process.env.GEMINI_API_KEY;
+    const geminiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
     if (!geminiKey) {
-      console.warn("WARNING: Gemini API Key is missing. AI features will fail. Set NEXT_PUBLIC_GEMINI_API_KEY in settings.");
+      console.warn("WARNING: NEXT_PUBLIC_GEMINI_API_KEY is missing in backend environment.");
+    } else {
+      console.log("Gemini API Key detected (First 4 chars):", geminiKey.substring(0, 4) + "...");
     }
     ai = new GoogleGenAI({ apiKey: geminiKey || "" });
     console.log("Gemini AI initialized.");
@@ -57,7 +59,7 @@ async function startServer() {
 
     try {
       const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
+        model: "gemini-2.0-flash",
         contents: `Analyze the following natural language search query for a gadget store: "${query}".
         Extract the intent: category (Audio, Wearables, Accessories), brand, maxPrice, and a cleaned correctedQuery (fix typos like 'hedset' to 'headset').
         Return as JSON.`,
@@ -96,7 +98,7 @@ async function startServer() {
 
     try {
       const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
+        model: "gemini-2.0-flash",
         contents: `Provide 5 search suggestions for a gadget store based on the partial query: "${q}". 
         Focus on headsets, earbuds, and smartwatches. Fix obvious typos.`,
         config: {
@@ -129,7 +131,7 @@ async function startServer() {
 
     try {
       const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
+        model: "gemini-2.0-flash",
         contents: messages.map((m: any) => ({
           role: m.role,
           parts: [{ text: m.parts }]
@@ -165,7 +167,7 @@ async function startServer() {
 
     try {
       const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
+        model: "gemini-2.0-flash",
         contents: `Correct the following misspelled tech gadget search query: "${query}".`,
         config: {
           responseMimeType: "application/json",
@@ -194,7 +196,7 @@ async function startServer() {
 
     try {
       const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
+        model: "gemini-2.0-flash",
         contents: `Generate 5 professional, tech-focused bullet points for a product named "${name}" in the "${category}" category. 
         Focus on key selling points, technical specs, and user benefits.
         Return as a single string with bullet points separated by newlines.`,

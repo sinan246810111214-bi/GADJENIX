@@ -14,6 +14,7 @@ export default function ProductDetail() {
   const [product, setProduct] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [relatedProducts, setRelatedProducts] = useState<any[]>([]);
+  const [isLiked, setIsLiked] = useState(false);
   const { addItem } = useCart();
 
   useEffect(() => {
@@ -33,6 +34,10 @@ export default function ProductDetail() {
           const data = { id: docSnap.id, ...docSnap.data() } as any;
           setProduct(data);
           
+          // Check wishlist persistence
+          const wishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
+          setIsLiked(wishlist.includes(docSnap.id));
+
           // Fetch related
           try {
             const q = query(
@@ -54,6 +59,58 @@ export default function ProductDetail() {
     };
     fetchProduct();
   }, [id]);
+
+  const toggleWishlist = () => {
+    if (!product) return;
+    const wishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
+    let updatedWishlist;
+    
+    if (isLiked) {
+      updatedWishlist = wishlist.filter((item: string) => item !== product.id);
+      toast.success('Removed from Wishlist', {
+        icon: <Heart className="w-4 h-4 text-slate-400" />,
+        className: "font-black uppercase tracking-widest text-[10px]"
+      });
+    } else {
+      updatedWishlist = [...wishlist, product.id];
+      toast.success('Added to Wishlist', {
+        icon: <Heart className="w-4 h-4 text-red-500 fill-current" />,
+        className: "font-black uppercase tracking-widest text-[10px]"
+      });
+    }
+    
+    localStorage.setItem('wishlist', JSON.stringify(updatedWishlist));
+    setIsLiked(!isLiked);
+  };
+
+  const handleShare = async () => {
+    if (!product) return;
+    
+    const shareData = {
+      title: product.name,
+      text: `Check out ${product.name} on Gadgenix!`,
+      url: window.location.href,
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(window.location.href);
+        toast.success('Link copied to clipboard!', {
+          className: "font-black uppercase tracking-widest text-[10px]"
+        });
+      }
+    } catch (err) {
+      if ((err as Error).name !== 'AbortError') {
+        // Fallback for failed share attempt
+        await navigator.clipboard.writeText(window.location.href);
+        toast.success('Link copied to clipboard!', {
+          className: "font-black uppercase tracking-widest text-[10px]"
+        });
+      }
+    }
+  };
 
   if (loading) {
     return (
@@ -132,11 +189,21 @@ export default function ProductDetail() {
                 >
                    <ShoppingCart className="mr-3 w-6 h-6" /> ADD TO CART
                 </Button>
-                <Button size="icon" variant="outline" className="h-20 w-20 rounded-[2rem] border-slate-200 shrink-0">
-                   <Heart className="w-6 h-6" />
+                <Button 
+                  size="icon" 
+                  variant="outline" 
+                  onClick={toggleWishlist}
+                  className={`h-20 w-20 rounded-[2rem] border-slate-200 shrink-0 transition-all ${isLiked ? 'bg-red-50 border-red-100 shadow-lg shadow-red-500/10' : ''}`}
+                >
+                   <Heart className={`w-6 h-6 transition-colors ${isLiked ? 'fill-red-500 text-red-500' : 'text-slate-400'}`} />
                 </Button>
-                <Button size="icon" variant="outline" className="h-20 w-20 rounded-[2rem] border-slate-200 shrink-0">
-                   <Share2 className="w-6 h-6" />
+                <Button 
+                  size="icon" 
+                  variant="outline" 
+                  onClick={handleShare}
+                  className="h-20 w-20 rounded-[2rem] border-slate-200 shrink-0 hover:bg-slate-50 transition-all"
+                >
+                   <Share2 className="w-6 h-6 text-slate-400" />
                 </Button>
               </div>
 
