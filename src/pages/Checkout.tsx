@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { useCart } from '@/lib/store';
@@ -18,9 +18,35 @@ import { Type } from "@google/genai";
 export default function Checkout() {
   const { items, getTotalPrice, clearCart } = useCart();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const checkCooldown = () => {
+      const ts = localStorage.getItem('qr_cooldown_timestamp');
+      if (ts) {
+        const expiredAt = parseInt(ts) + (3 * 60 * 1000);
+        if (Date.now() < expiredAt) {
+          setQrCooldownUntil(expiredAt);
+          const timer = setInterval(() => {
+            const now = Date.now();
+            if (now >= expiredAt) {
+              setQrCooldownUntil(null);
+              localStorage.removeItem('qr_cooldown_timestamp');
+              clearInterval(timer);
+            }
+          }, 1000);
+          return () => clearInterval(timer);
+        } else {
+          localStorage.removeItem('qr_cooldown_timestamp');
+        }
+      }
+    };
+    checkCooldown();
+  }, []);
+
   const [isProcessing, setIsProcessing] = useState(false);
   const [isAIVerifying, setIsAIVerifying] = useState(false);
   const [isOrdered, setIsOrdered] = useState(false);
+  const [qrCooldownUntil, setQrCooldownUntil] = useState<number | null>(null);
   const [screenshotFile, setScreenshotFile] = useState<File | null>(null);
   const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null);
   const [formData, setFormData] = useState({
@@ -221,6 +247,7 @@ export default function Checkout() {
 
       setIsOrdered(true);
       clearCart();
+      localStorage.setItem('qr_cooldown_timestamp', Date.now().toString());
       toast.success("Transaction Sequence Successfully Completed");
       
     } catch (err: any) {
@@ -410,8 +437,27 @@ export default function Checkout() {
                       </div>
                       
                       <div className="p-4 bg-white rounded-3xl inline-block shadow-2xl relative group">
-                         <QRCodeSVG value={upiUri} size={200} level="H" />
-                         <div className="absolute inset-0 border-2 border-primary/20 rounded-3xl pointer-events-none group-hover:border-primary/50 transition-colors" />
+                         {qrCooldownUntil ? (
+                           <div className="w-[200px] h-[200px] flex flex-col items-center justify-center bg-slate-100 rounded-2xl p-4 text-slate-900 border-4 border-primary/20">
+                              <ShieldCheck className="w-8 h-8 text-primary mb-2 animate-pulse" />
+                              <p className="text-[10px] font-black uppercase tracking-widest text-center">Secure Cooldown</p>
+                              <p className="text-[8px] text-slate-500 font-bold mt-1 uppercase text-center mb-3">Wait {Math.ceil((qrCooldownUntil - Date.now()) / 1000)}s for next QR</p>
+                              
+                              <a 
+                                href="https://wa.me/918590181381" 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="w-full py-2 bg-green-500 hover:bg-green-600 text-white rounded-xl flex items-center justify-center gap-2 transition-all active:scale-95 shadow-lg shadow-green-500/20"
+                              >
+                                <span className="text-[9px] font-black uppercase tracking-tighter">Contact WhatsApp</span>
+                              </a>
+                           </div>
+                         ) : (
+                           <>
+                             <QRCodeSVG value={upiUri} size={200} level="H" />
+                             <div className="absolute inset-0 border-2 border-primary/20 rounded-3xl pointer-events-none group-hover:border-primary/50 transition-colors" />
+                           </>
+                         )}
                       </div>
 
                       <div className="flex flex-col gap-2">
