@@ -578,6 +578,19 @@ export default function AdminDashboard() {
                                       </div>
                                     )}
                                  </div>
+                                 {o.customer?.notes && (
+                                   <div className="p-4 bg-amber-50 border border-amber-100 rounded-2xl">
+                                      <p className="text-[9px] font-black uppercase text-amber-600 mb-1 tracking-widest">Special Instructions / Extra Products:</p>
+                                      {o.customer.extraQuantity > 0 && <p className="text-xs font-black text-amber-700 mb-1">Extra Units Requested: {o.customer.extraQuantity}</p>}
+                                      <p className="text-[11px] font-bold text-amber-900 leading-relaxed italic">"{o.customer.notes}"</p>
+                                   </div>
+                                 )}
+                                 {!o.customer?.notes && o.customer?.extraQuantity > 0 && (
+                                   <div className="p-4 bg-amber-50 border border-amber-100 rounded-2xl">
+                                      <p className="text-[9px] font-black uppercase text-amber-600 mb-1 tracking-widest">Extra Products:</p>
+                                      <p className="text-xs font-black text-amber-700">Extra Units Requested: {o.customer.extraQuantity}</p>
+                                   </div>
+                                 )}
                               </div>
 
                               <div className="w-full lg:w-auto flex flex-row lg:flex-col items-center lg:items-end justify-between gap-4">

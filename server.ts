@@ -98,6 +98,19 @@ async function startServer() {
             <p><strong>Pincode:</strong> ${customer.pincode}</p>
           </div>
 
+          ${customer.notes ? `
+          <div style="background: #fefce8; padding: 20px; border-radius: 15px; margin-bottom: 25px; border: 1px solid #fef08a;">
+            <h3 style="margin-top: 0; color: #a16207;">Extra Products / Special Instructions:</h3>
+            ${customer.extraQuantity > 0 ? `<p><strong>Extra Units Requested:</strong> ${customer.extraQuantity}</p>` : ''}
+            <p style="white-space: pre-wrap;">${customer.notes}</p>
+          </div>
+          ` : customer.extraQuantity > 0 ? `
+          <div style="background: #fefce8; padding: 20px; border-radius: 15px; margin-bottom: 25px; border: 1px solid #fef08a;">
+            <h3 style="margin-top: 0; color: #a16207;">Extra Products:</h3>
+            <p><strong>Extra Units Requested:</strong> ${customer.extraQuantity}</p>
+          </div>
+          ` : ''}
+
           <div style="background: #fff7ed; padding: 20px; border-radius: 15px; margin-bottom: 25px; border: 1px solid #fed7aa;">
             <h3 style="margin-top: 0; color: #ea580c;">Transaction Protocol:</h3>
             <p><strong>Method:</strong> ${customer.paymentMethod?.toUpperCase()}</p>

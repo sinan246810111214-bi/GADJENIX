@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ShoppingCart, ShieldCheck, Truck, CreditCard, ChevronRight, Zap, CheckCircle2, QrCode, Upload, FileImage, X, Loader2 } from 'lucide-react';
+import { ShoppingCart, ShieldCheck, Truck, CreditCard, ChevronRight, Zap, CheckCircle2, QrCode, Upload, FileImage, X, Loader2, Plus, Minus } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { PAYMENT_CONFIG } from '@/lib/constants';
 import { toast } from 'sonner';
@@ -16,7 +16,7 @@ import { getGemini, GEMINI_MODEL } from "@/lib/gemini";
 import { Type } from "@google/genai";
 
 export default function Checkout() {
-  const { items, getTotalPrice, clearCart } = useCart();
+  const { items, getTotalPrice, clearCart, updateQuantity } = useCart();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -58,7 +58,9 @@ export default function Checkout() {
     pincode: '',
     phone: '',
     paymentMethod: 'upi',
-    transactionId: ''
+    transactionId: '',
+    notes: '',
+    extraQuantity: 0
   });
 
   if (items.length === 0 && !isOrdered) {
@@ -208,7 +210,9 @@ export default function Checkout() {
       const orderData = {
         customer: {
           ...formData,
-          email: formData.email || 'not-provided'
+          email: formData.email || 'not-provided',
+          notes: formData.notes || '',
+          extraQuantity: formData.extraQuantity
         },
         items: items.map(item => ({
           id: item.id,
@@ -381,6 +385,37 @@ export default function Checkout() {
                       placeholder="+91 Matrix ID" 
                       className="h-14 rounded-xl bg-slate-50 border-none font-bold" 
                     />
+                 </div>
+                 <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                       <Label className="font-bold text-xs uppercase tracking-widest text-slate-400">Extra Product Units</Label>
+                       <div className="flex items-center gap-4 px-4 py-2 border-2 border-yellow-400 rounded-full bg-white text-slate-900 shadow-sm transition-all focus-within:ring-2 focus-within:ring-yellow-400/20">
+                          <button 
+                            type="button"
+                            onClick={() => setFormData(prev => ({...prev, extraQuantity: Math.max(0, prev.extraQuantity - 1)}))}
+                            className="p-1 hover:bg-slate-100 rounded-full transition-colors active:scale-90"
+                          >
+                             <Minus className="w-4 h-4" />
+                          </button>
+                          <span className="font-black text-base min-w-[30px] text-center">{formData.extraQuantity}</span>
+                          <button 
+                            type="button"
+                            onClick={() => setFormData(prev => ({...prev, extraQuantity: prev.extraQuantity + 1}))}
+                            className="p-1 hover:bg-slate-100 rounded-full transition-colors active:scale-90"
+                          >
+                             <Plus className="w-4 h-4" />
+                          </button>
+                       </div>
+                    </div>
+                    <div className="space-y-2">
+                       <Label className="font-bold text-[10px] uppercase tracking-[0.2em] text-slate-400">Detail Specifications / Special Instructions</Label>
+                       <textarea 
+                         value={formData.notes}
+                         onChange={e => setFormData({...formData, notes: e.target.value})}
+                         placeholder="If you requested extra products above, please specify which models/parts here. Also add any delivery constraints." 
+                         className="w-full min-h-[120px] p-5 rounded-2xl bg-slate-50 border-none font-bold text-sm focus:ring-2 focus:ring-primary/20 transition-all outline-none" 
+                       />
+                    </div>
                  </div>
               </div>
 
@@ -576,7 +611,25 @@ export default function Checkout() {
                          </div>
                          <div className="flex-1">
                             <h4 className="font-bold text-sm line-clamp-1 group-hover:text-primary transition-colors">{item.name}</h4>
-                            <p className="text-xs text-gray-400 font-bold uppercase mt-1">QTY: {item.quantity}</p>
+                            <div className="mt-2 flex items-center gap-3">
+                               <div className="flex items-center gap-4 px-3 py-1.5 border-2 border-yellow-400 rounded-full bg-white text-slate-900 shadow-sm">
+                                  <button 
+                                    type="button"
+                                    onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                    className="p-0.5 hover:bg-slate-100 rounded-full transition-colors active:scale-90"
+                                  >
+                                     <Minus className="w-3.5 h-3.5" />
+                                  </button>
+                                  <span className="font-black text-sm min-w-[20px] text-center">{item.quantity}</span>
+                                  <button 
+                                    type="button"
+                                    onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                    className="p-0.5 hover:bg-slate-100 rounded-full transition-colors active:scale-90"
+                                  >
+                                     <Plus className="w-3.5 h-3.5" />
+                                  </button>
+                               </div>
+                            </div>
                          </div>
                          <span className="font-bold text-sm">₹{item.price * item.quantity}</span>
                       </div>

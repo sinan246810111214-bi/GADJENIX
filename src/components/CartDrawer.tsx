@@ -94,17 +94,17 @@ export default function CartDrawer() {
                       <p className="text-xl font-black font-mono text-slate-900">₹{item.price}</p>
                       
                       <div className="flex items-center gap-3 pt-1">
-                        <div className="flex items-center bg-slate-50 border border-slate-100 rounded-xl overflow-hidden p-1">
+                        <div className="flex items-center gap-3 px-3 py-1 border-2 border-yellow-400 rounded-full bg-white text-slate-900 shadow-sm">
                           <button
                             onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                            className="p-1 px-2 hover:bg-slate-200 text-slate-600 rounded-lg transition-colors"
+                            className="p-1 hover:bg-slate-100 rounded-full transition-colors active:scale-90"
                           >
                             <Minus className="w-3 h-3" />
                           </button>
-                          <span className="text-xs font-black w-8 text-center">{item.quantity}</span>
+                          <span className="text-xs font-black w-6 text-center">{item.quantity}</span>
                           <button
                             onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                            className="p-1 px-2 hover:bg-slate-200 text-slate-600 rounded-lg transition-colors"
+                            className="p-1 hover:bg-slate-100 rounded-full transition-colors active:scale-90"
                           >
                             <Plus className="w-3 h-3" />
                           </button>
