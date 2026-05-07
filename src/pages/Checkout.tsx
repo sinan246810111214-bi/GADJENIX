@@ -488,10 +488,28 @@ export default function Checkout() {
                               </a>
                            </div>
                          ) : (
-                           <>
-                             <QRCodeSVG value={upiUri} size={200} level="H" />
-                             <div className="absolute inset-0 border-2 border-primary/20 rounded-3xl pointer-events-none group-hover:border-primary/50 transition-colors" />
-                           </>
+                           <div className="flex flex-col gap-4">
+                             <div className="relative">
+                               <QRCodeSVG value={upiUri} size={200} level="H" className="hidden md:block" />
+                               <div className="hidden md:block absolute inset-0 border-2 border-primary/20 rounded-3xl pointer-events-none group-hover:border-primary/50 transition-colors" />
+                             </div>
+                             
+                             {/* Mobile Direct Pay Button */}
+                             <a 
+                               href={upiUri}
+                               className="md:hidden w-[200px] flex flex-col items-center justify-center gap-3 p-6 bg-primary text-slate-900 rounded-2xl font-black shadow-xl active:scale-95 transition-all"
+                             >
+                               <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                                 <Zap className="w-6 h-6 animate-pulse" />
+                               </div>
+                               <div className="text-center">
+                                 <p className="text-[10px] uppercase tracking-widest opacity-70">Mobile detected</p>
+                                 <p className="text-sm uppercase tracking-tighter leading-none mt-1">OPEN UPI APP</p>
+                               </div>
+                             </a>
+
+                             <p className="md:hidden text-[9px] text-slate-400 font-bold uppercase tracking-widest">Click above to pay directly</p>
+                           </div>
                          )}
                       </div>
 
