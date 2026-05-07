@@ -16,7 +16,7 @@ import { Card } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
-import { generateProductFeatures } from '@/services/geminiService';
+import { generateProductFeatures, generateTechnicalSpecs } from '@/services/geminiService';
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
@@ -150,7 +150,7 @@ export default function AdminDashboard() {
   const handleSaveProduct = async (e: React.FormEvent) => {
     e.preventDefault();
     const data = new FormData(e.target as HTMLFormElement);
-    const productData = {
+    const productData: any = {
       name: data.get('name'),
       price: Number(data.get('price')),
       oldPrice: Number(data.get('oldPrice')),
@@ -158,6 +158,7 @@ export default function AdminDashboard() {
       description: data.get('description'),
       tag: data.get('tag'),
       image: editingProduct?.image || '',
+      technicalSpecs: editingProduct?.technicalSpecs || [],
       updatedAt: serverTimestamp()
     };
 
@@ -289,6 +290,42 @@ export default function AdminDashboard() {
     } finally {
       setGenerating(false);
     }
+  };
+
+  const handleGeminiSpecs = async () => {
+    if (!editingProduct?.name || !editingProduct?.category) {
+      toast.error("Need Name and Category for Generation");
+      return;
+    }
+    setGenerating(true);
+    try {
+      const specs = await generateTechnicalSpecs(editingProduct.name, editingProduct.category);
+      setEditingProduct({ ...editingProduct, technicalSpecs: specs });
+      toast.success("AI Spec Synthesis Complete");
+    } catch (err) {
+      toast.error("AI Node Offline");
+    } finally {
+      setGenerating(false);
+    }
+  };
+
+  const addSpecField = () => {
+    const specs = editingProduct?.technicalSpecs || [];
+    setEditingProduct({
+      ...editingProduct,
+      technicalSpecs: [...specs, { label: '', value: '' }]
+    });
+  };
+
+  const updateSpecField = (index: number, field: 'label' | 'value', value: string) => {
+    const specs = [...(editingProduct?.technicalSpecs || [])];
+    specs[index] = { ...specs[index], [field]: value };
+    setEditingProduct({ ...editingProduct, technicalSpecs: specs });
+  };
+
+  const removeSpecField = (index: number) => {
+    const specs = (editingProduct?.technicalSpecs || []).filter((_: any, i: number) => i !== index);
+    setEditingProduct({ ...editingProduct, technicalSpecs: specs });
   };
 
   const saveSettings = async () => {
@@ -888,6 +925,64 @@ export default function AdminDashboard() {
                                }
                             }}
                           />
+                       </div>
+                    </div>
+
+                    <div className="space-y-4">
+                       <div className="flex items-center justify-between">
+                          <Label className="font-bold text-[10px] uppercase tracking-widest text-slate-400 ml-1">Technical Matrix (Detailed Specs)</Label>
+                          <div className="flex gap-2">
+                            <Button 
+                              type="button" 
+                              variant="ghost" 
+                              disabled={generating}
+                              onClick={handleGeminiSpecs}
+                              className="h-8 text-[9px] font-black uppercase text-primary hover:bg-primary/5 rounded-full px-4"
+                            >
+                               {generating ? <Loader2 className="w-3 h-3 animate-spin mr-2" /> : <Wand2 className="w-3 h-3 mr-2" />}
+                               AI Specs
+                            </Button>
+                            <Button 
+                              type="button" 
+                              variant="ghost"
+                              onClick={addSpecField}
+                              className="h-8 text-[9px] font-black uppercase text-slate-900 border-2 border-slate-100 hover:bg-slate-50 rounded-lg px-4"
+                            >
+                               <Plus className="w-3 h-3 mr-2" /> Add Field
+                            </Button>
+                          </div>
+                       </div>
+
+                       <div className="space-y-3 max-h-[300px] overflow-y-auto no-scrollbar pr-2 text-slate-900">
+                          {(editingProduct?.technicalSpecs || []).length === 0 && (
+                            <div className="py-10 text-center border-2 border-dashed border-slate-50 rounded-3xl">
+                               <p className="text-[10px] font-bold text-slate-300 uppercase tracking-widest">No Specs Defined</p>
+                            </div>
+                          )}
+                          {(editingProduct?.technicalSpecs || []).map((spec: any, idx: number) => (
+                            <div key={idx} className="grid grid-cols-5 gap-3 group">
+                               <Input 
+                                 placeholder="Label (e.g. Battery)" 
+                                 value={spec.label}
+                                 onChange={(e) => updateSpecField(idx, 'label', e.target.value)}
+                                 className="col-span-2 h-12 rounded-xl bg-slate-50 border-none font-bold text-xs" 
+                               />
+                               <Input 
+                                 placeholder="Value (e.g. 500mAh)" 
+                                 value={spec.value}
+                                 onChange={(e) => updateSpecField(idx, 'value', e.target.value)}
+                                 className="col-span-2 h-12 rounded-xl bg-slate-50 border-none font-bold text-xs" 
+                               />
+                               <Button 
+                                 type="button"
+                                 onClick={() => removeSpecField(idx)}
+                                 variant="ghost" 
+                                 className="h-12 w-12 rounded-xl hover:bg-red-50 text-red-200 hover:text-red-500"
+                               >
+                                  <Trash2 className="w-4 h-4" />
+                               </Button>
+                            </div>
+                          ))}
                        </div>
                     </div>
 

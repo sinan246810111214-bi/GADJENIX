@@ -131,3 +131,41 @@ export async function generateProductFeatures(name: string, category: string) {
     return "Failed to generate features.";
   }
 }
+
+export async function generateTechnicalSpecs(name: string, category: string) {
+  try {
+    const ai = getGemini();
+    const response = await ai.models.generateContent({
+      model: GEMINI_MODEL,
+      contents: `Generate 6 technical specifications for a product named "${name}" in the "${category}" category. 
+      Common labels for gadgets: Weight, Connectivity, Battery Life, Drivers, Latency, Interface, Waterproof Rating, Bluetooth version.
+      Return as an array of objects with 'label' and 'value'. Return as JSON.`,
+      config: {
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            specs: { 
+              type: Type.ARRAY,
+              items: {
+                type: Type.OBJECT,
+                properties: {
+                  label: { type: Type.STRING },
+                  value: { type: Type.STRING }
+                },
+                required: ["label", "value"]
+              }
+            },
+          },
+          required: ["specs"],
+        },
+      },
+    });
+
+    const result = JSON.parse(response.text || "{}");
+    return result.specs || [];
+  } catch (error) {
+    console.error("AI Spec Gen Error:", error);
+    return [];
+  }
+}

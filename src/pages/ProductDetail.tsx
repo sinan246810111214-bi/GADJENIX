@@ -249,19 +249,26 @@ export default function ProductDetail() {
       <section className="bg-slate-50 rounded-[3rem] p-12 space-y-10 border border-slate-100">
          <h2 className="text-3xl font-black uppercase tracking-tight">Technical Specifications</h2>
          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
-            {[
-              { label: 'Weight', value: '180g / Ultra-light' },
-              { label: 'Connectivity', value: 'Bluetooth 5.4 High-Bitrate' },
-              { label: 'Battery', value: '48h Latency Controlled' },
-              { label: 'Drivers', value: '50mm Graphene Composite' },
-              { label: 'Latency', value: 'Ultra-low <20ms' },
-              { label: 'Interface', value: 'USB-C / Wireless Matrix' },
-            ].map(spec => (
-              <div key={spec.label} className="space-y-2">
+            {(product.technicalSpecs && product.technicalSpecs.length > 0) ? product.technicalSpecs.map((spec: any, idx: number) => (
+              <div key={idx} className="space-y-2">
                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{spec.label}</p>
                  <p className="text-lg font-bold text-slate-800">{spec.value}</p>
               </div>
-            ))}
+            )) : (
+              [
+                { label: 'Weight', value: product.specs?.weight || '180g / Ultra-light' },
+                { label: 'Connectivity', value: product.specs?.bluetooth || 'Bluetooth 5.4 High-Bitrate' },
+                { label: 'Battery', value: product.specs?.battery || '48h Latency Controlled' },
+                { label: 'Drivers', value: product.specs?.driverSize || '50mm Graphene Composite' },
+                { label: 'Latency', value: 'Ultra-low <20ms' },
+                { label: 'Interface', value: 'USB-C / Wireless Matrix' },
+              ].map(spec => (
+                <div key={spec.label} className="space-y-2">
+                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{spec.label}</p>
+                   <p className="text-lg font-bold text-slate-800">{spec.value}</p>
+                </div>
+              ))
+            )}
          </div>
       </section>
     </div>
