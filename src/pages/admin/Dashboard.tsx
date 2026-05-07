@@ -6,7 +6,8 @@ import {
   Plus, Trash2, Edit3, Save, X, Image as ImageIcon, 
   LayoutDashboard, ShoppingBag, Settings as SettingsIcon,
   LogOut, Zap, MoreVertical, Search, Filter, Loader2, Sparkles, Wand2,
-  TrendingUp, Users, DollarSign, Package, User, ShieldAlert
+  TrendingUp, Users, DollarSign, Package, User, ShieldAlert,
+  Languages, FileText, Layout
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -16,7 +17,7 @@ import { Card } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
-import { generateProductFeatures, generateTechnicalSpecs } from '@/services/geminiService';
+import { generateProductFeatures, generateTechnicalSpecs, translateToMalayalam } from '@/services/geminiService';
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
@@ -287,6 +288,58 @@ export default function AdminDashboard() {
       toast.success("AI Synthesis Complete");
     } catch (err) {
       toast.error("AI Node Offline");
+    } finally {
+      setGenerating(false);
+    }
+  };
+
+  const SPEC_TEMPLATES = {
+    Audio: [
+      { label: 'Drivers', value: '' },
+      { label: 'Frequency', value: '' },
+      { label: 'Latency', value: '' },
+      { label: 'Battery', value: '' },
+      { label: 'Connectivity', value: '' },
+      { label: 'Weight', value: '' }
+    ],
+    Wearables: [
+      { label: 'Display', value: '' },
+      { label: 'Sensors', value: '' },
+      { label: 'Waterproof', value: '' },
+      { label: 'Battery', value: '' },
+      { label: 'Compatibility', value: '' },
+      { label: 'Strap Material', value: '' }
+    ],
+    Accessories: [
+      { label: 'Material', value: '' },
+      { label: 'Dimensions', value: '' },
+      { label: 'Weight', value: '' },
+      { label: 'In the Box', value: '' }
+    ]
+  };
+
+  const applyTemplate = () => {
+    const category = editingProduct?.category as keyof typeof SPEC_TEMPLATES;
+    const template = SPEC_TEMPLATES[category] || SPEC_TEMPLATES.Audio;
+    setEditingProduct({
+      ...editingProduct,
+      technicalSpecs: template
+    });
+    toast.success(`${category} Template Applied`);
+  };
+
+  const handleTranslateDescription = async () => {
+    if (!editingProduct?.description) {
+      toast.error("Description buffer empty");
+      return;
+    }
+    setGenerating(true);
+    try {
+      const translated = await translateToMalayalam(editingProduct.description);
+      setEditingProduct({ ...editingProduct, description: translated });
+      toast.success("Malayalam Script Generated");
+    } catch (err) {
+      toast.error("Translation node failure");
     } finally {
       setGenerating(false);
     }
@@ -889,20 +942,33 @@ export default function AdminDashboard() {
                     <div className="space-y-3">
                        <div className="flex items-center justify-between">
                           <Label className="font-bold text-[10px] uppercase tracking-widest text-slate-400 ml-1">Technical Specification</Label>
-                          <Button 
-                            type="button" 
-                            variant="ghost" 
-                            disabled={generating}
-                            onClick={handleGeminiFeatures}
-                            className="h-8 text-[9px] font-black uppercase text-primary hover:bg-primary/5 rounded-full px-4"
-                          >
-                             {generating ? <Loader2 className="w-3 h-3 animate-spin mr-2" /> : <Sparkles className="w-3 h-3 mr-2" />}
-                             Synthesize with Gemini
-                          </Button>
+                          <div className="flex gap-2">
+                            <Button 
+                              type="button" 
+                              variant="ghost" 
+                              disabled={generating}
+                              onClick={handleGeminiFeatures}
+                              className="h-8 text-[9px] font-black uppercase text-primary hover:bg-primary/5 rounded-full px-4"
+                            >
+                               {generating ? <Loader2 className="w-3 h-3 animate-spin mr-2" /> : <Sparkles className="w-3 h-3 mr-2" />}
+                               Synthesize
+                            </Button>
+                            <Button 
+                              type="button" 
+                              variant="ghost" 
+                              disabled={generating}
+                              onClick={handleTranslateDescription}
+                              className="h-8 text-[9px] font-black uppercase text-amber-600 hover:bg-amber-50 rounded-full px-4 border border-amber-100"
+                            >
+                               {generating && !editingProduct?.description?.includes(' ') ? <Loader2 className="w-3 h-3 animate-spin mr-2" /> : <Languages className="w-3 h-3 mr-2" />}
+                               Malayalam
+                            </Button>
+                          </div>
                        </div>
                        <Textarea 
                          name="description" 
-                         defaultValue={editingProduct?.description} 
+                         value={editingProduct?.description || ''} 
+                         onChange={e => setEditingProduct({...editingProduct, description: e.target.value})}
                          className="min-h-[160px] rounded-[2rem] bg-slate-50 border-none font-medium text-sm leading-relaxed p-6" 
                          placeholder="Enter hardware specifications or use AI synthesis..."
                        />
@@ -935,6 +1001,15 @@ export default function AdminDashboard() {
                             <Button 
                               type="button" 
                               variant="ghost" 
+                              onClick={applyTemplate}
+                              className="h-8 text-[9px] font-black uppercase text-slate-500 hover:bg-slate-50 rounded-full px-4 border border-slate-200"
+                            >
+                               <Layout className="w-3 h-3 mr-2" />
+                               Template
+                            </Button>
+                            <Button 
+                              type="button" 
+                              variant="ghost" 
                               disabled={generating}
                               onClick={handleGeminiSpecs}
                               className="h-8 text-[9px] font-black uppercase text-primary hover:bg-primary/5 rounded-full px-4"
@@ -948,7 +1023,7 @@ export default function AdminDashboard() {
                               onClick={addSpecField}
                               className="h-8 text-[9px] font-black uppercase text-slate-900 border-2 border-slate-100 hover:bg-slate-50 rounded-lg px-4"
                             >
-                               <Plus className="w-3 h-3 mr-2" /> Add Field
+                               <Plus className="w-3 h-3 mr-2" /> Add 
                             </Button>
                           </div>
                        </div>

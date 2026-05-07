@@ -132,6 +132,26 @@ export async function generateProductFeatures(name: string, category: string) {
   }
 }
 
+export async function translateToMalayalam(text: string) {
+  try {
+    const ai = getGemini();
+    const response = await ai.models.generateContent({
+      model: GEMINI_MODEL,
+      contents: `Translate the following product description into natural, professional Malayalam. 
+      Keep the technical terms (like Bluetooth, Battery, mAh, Latency) in English characters if they are commonly used that way, 
+      or use the phonetic Malayalam equivalent if appropriate for a tech store.
+      
+      Text to translate:
+      ${text}`,
+    });
+
+    return response.text?.trim() || "Translation failed.";
+  } catch (error) {
+    console.error("AI Translation Error:", error);
+    return "Node Offline: Translation could not be completed.";
+  }
+}
+
 export async function generateTechnicalSpecs(name: string, category: string) {
   try {
     const ai = getGemini();
