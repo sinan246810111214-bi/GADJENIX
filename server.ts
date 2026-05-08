@@ -20,7 +20,7 @@ async function startServer() {
     
     // Move all initializations inside try-catch to prevent startup crashes
     cloudinary.config({
-      cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+      cloud_name: process.env.CLOUDINARY_CLOUD_NAME || process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
       api_key: process.env.CLOUDINARY_API_KEY,
       api_secret: process.env.CLOUDINARY_API_SECRET,
     });
@@ -137,7 +137,7 @@ async function startServer() {
       `;
 
       let sent = false;
-      const adminEmail = "klgadjenix@gmail.com";
+      const adminEmail = process.env.ADMIN_EMAIL || "klgadjenix@gmail.com";
 
       // 1. Try Resend if configured
       if (resend) {

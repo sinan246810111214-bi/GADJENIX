@@ -1,7 +1,18 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
-import firebaseConfig from "../../firebase-applet-config.json";
+import backupConfig from "../../firebase-applet-config.json";
+
+// Standard Firebase Config using Environment Variables
+const firebaseConfig = {
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || backupConfig.apiKey,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || backupConfig.authDomain,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || backupConfig.projectId,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || backupConfig.storageBucket,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || backupConfig.messagingSenderId,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || backupConfig.appId,
+  firestoreDatabaseId: import.meta.env.VITE_FIREBASE_DATABASE_ID || backupConfig.firestoreDatabaseId
+};
 
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);

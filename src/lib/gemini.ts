@@ -5,7 +5,7 @@ let genAI: GoogleGenAI | null = null;
 export function getGemini() {
   if (genAI) return genAI;
 
-  const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+  const apiKey = import.meta.env.VITE_GEMINI_API_KEY || process.env.GEMINI_API_KEY;
   
   if (!apiKey || apiKey === "") {
     // We throw a descriptive error that will be caught by the service layers
