@@ -73,15 +73,15 @@ export default function Home() {
             <Badge className="w-fit bg-primary/20 text-primary border-primary/30 px-6 py-2 rounded-full font-black uppercase tracking-[0.4em] text-[10px] backdrop-blur-xl">
                {banners[0]?.tagline || defaultBanner.tagline}
             </Badge>
-            <h1 className="text-6xl md:text-8xl font-black text-white leading-[0.85] tracking-tighter">
+            <h1 className="text-5xl md:text-8xl font-black text-white leading-[0.85] tracking-tighter">
                {banners[0]?.title || defaultBanner.title}
             </h1>
-            <p className="text-lg md:text-xl text-slate-400 font-medium max-w-2xl leading-relaxed">
+            <p className="text-base md:text-xl text-slate-400 font-medium max-w-2xl leading-relaxed">
                {banners[0]?.description || defaultBanner.description}
             </p>
             <div className="flex gap-4">
-               <Link to="/products">
-                 <Button size="lg" className="h-16 px-10 rounded-2xl bg-primary text-white font-black text-lg shadow-2xl shadow-primary/40 hover:scale-105 transition-all">
+               <Link to="/products" className="w-full sm:w-auto">
+                 <Button size="lg" className="w-full h-16 px-10 rounded-2xl bg-primary text-white font-black text-lg shadow-2xl shadow-primary/40 hover:scale-105 transition-all">
                     Shop Now <ArrowRight className="ml-2 w-5 h-5" />
                  </Button>
                </Link>

@@ -221,7 +221,7 @@ const Navbar = () => {
                  }
                />
                <SheetContent side="right" className="w-[300px] sm:w-[400px] rounded-l-[2rem] border-none shadow-2xl">
-                  <div className="mt-12 space-y-8">
+                  <div className="mt-12 space-y-8 h-full flex flex-col">
                      <div className="space-y-2">
                         <p className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground">Main Menu</p>
                         <div className="grid gap-2">
@@ -242,11 +242,18 @@ const Navbar = () => {
                              </Link>
                            ))}
                         </div>
+                        <div className="mt-8 pt-8 border-t border-muted">
+                           <p className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground mb-4">Node Operations</p>
+                           <Link to="/admin" className="flex items-center justify-center w-full text-[10px] text-muted-foreground uppercase font-black hover:text-primary transition-all tracking-[0.3em] py-4 border border-border rounded-2xl">Team Access</Link>
+                        </div>
                      </div>
                   </div>
                </SheetContent>
             </Sheet>
           </div>
+        </div>
+        <div className="lg:hidden flex justify-center pb-2 mt-[-5px]">
+          <Link to="/admin" className="text-[8px] font-black uppercase text-muted-foreground/30 hover:text-primary transition-all tracking-[0.5em]">Team Protocol</Link>
         </div>
       </div>
     </header>
@@ -310,10 +317,14 @@ const Footer = () => (
         </div>
       </div>
     </div>
-    <div className="max-w-[1500px] mx-auto px-4 md:px-8 border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-500 font-medium">
-      <p>© 2026 GADGENIX TECHNOLOGY CO. ALL RIGHTS RESERVED.</p>
+    <div className="max-w-[1500px] mx-auto px-4 md:px-8 border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-6 text-xs text-gray-500 font-medium">
+      <div className="flex flex-col items-center md:items-start gap-2">
+        <p>© 2026 GADGENIX TECHNOLOGY CO. ALL RIGHTS RESERVED.</p>
+        <Link to="/admin" className="md:hidden text-[10px] text-gray-600 uppercase font-black tracking-widest hover:text-white transition-colors">Team Access</Link>
+      </div>
       <div className="flex gap-8">
-         <Link to="/admin" className="hover:text-white transition-colors opacity-10 hover:opacity-100">Node Access</Link>
+         <Link to="/admin" className="hidden md:block hover:text-white transition-colors opacity-10 hover:opacity-100">Node Access</Link>
+         <Link to="/admin" className="md:hidden hover:text-white transition-colors opacity-40">Team</Link>
          <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
          <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
       </div>

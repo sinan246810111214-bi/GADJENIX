@@ -155,8 +155,8 @@ export default function ProductDetail() {
               <Badge className="bg-primary/10 text-primary border-primary/20 px-4 py-1.5 rounded-full font-black uppercase tracking-widest text-[10px]">
                  {product.category} Module
               </Badge>
-              <h1 className="text-5xl md:text-6xl font-black tracking-tighter uppercase leading-none">
-                 {product.name}
+              <h1 className="text-4xl md:text-6xl font-black tracking-tighter uppercase leading-none">
+                {product.name}
               </h1>
               <div className="flex items-center gap-4">
                  <div className="flex text-yellow-400">
@@ -168,9 +168,9 @@ export default function ProductDetail() {
 
            <div className="space-y-6">
               <div className="flex items-baseline gap-6">
-                 <span className="text-6xl font-black font-mono text-slate-900">₹{product.price}</span>
+                 <span className="text-4xl md:text-6xl font-black font-mono text-slate-900">₹{product.price}</span>
                  {product.oldPrice && (
-                   <span className="text-2xl text-slate-400 line-through font-bold">₹{product.oldPrice}</span>
+                   <span className="text-xl md:text-2xl text-slate-400 line-through font-bold">₹{product.oldPrice}</span>
                  )}
               </div>
               <p className="text-slate-500 font-medium text-xl leading-relaxed">
