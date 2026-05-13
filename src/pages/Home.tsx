@@ -176,6 +176,44 @@ export default function Home() {
             <p className="text-slate-400 font-medium">Every module undergoes 12-point hardware inspection.</p>
          </div>
       </section>
+
+      {/* Customer Support Section */}
+      <section className="px-8 flex flex-col items-center text-center space-y-12">
+        <div className="space-y-4">
+           <Badge className="bg-primary/10 text-primary border-primary/20 px-6 py-2 rounded-full font-black uppercase tracking-[0.4em] text-[10px]">Human Interface</Badge>
+           <h2 className="text-5xl md:text-7xl font-black uppercase tracking-tighter">Customer Care</h2>
+           <p className="text-slate-500 font-medium max-w-2xl mx-auto">Our specialized support unit is ready to assist with technical queries or order logistics.</p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-6xl">
+           <div className="bg-white p-10 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/50 flex flex-col items-center group hover:-translate-y-2 transition-all cursor-pointer" onClick={() => window.location.href = 'tel:+918714756560'}>
+              <div className="w-16 h-16 bg-primary/10 text-primary rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                 <Truck className="w-8 h-8" />
+              </div>
+              <h3 className="text-xl font-black uppercase mb-4">Phone Support</h3>
+              <a href="tel:+918714756560" className="text-2xl font-black hover:text-primary transition-colors">+91 87147 56560</a>
+              <p className="text-xs text-slate-400 mt-4 uppercase font-bold tracking-widest">Available 10AM - 8PM</p>
+           </div>
+
+           <a href="https://wa.me/918590181381" target="_blank" rel="noopener noreferrer" className="bg-green-500 p-10 rounded-[2.5rem] text-white shadow-xl shadow-green-500/20 flex flex-col items-center group hover:-translate-y-2 transition-all">
+              <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                 <Headphones className="w-8 h-8" />
+              </div>
+              <h3 className="text-xl font-black uppercase mb-4">WhatsApp Care</h3>
+              <span className="text-2xl font-black hover:opacity-80 transition-opacity">8590181381</span>
+              <p className="text-xs text-green-100 mt-4 uppercase font-bold tracking-widest">Instant Response</p>
+           </a>
+
+           <div className="bg-slate-900 p-10 rounded-[2.5rem] text-white shadow-xl shadow-slate-900/20 flex flex-col items-center group hover:-translate-y-2 transition-all cursor-pointer" onClick={() => window.location.href = 'mailto:KLGADJENIX@GMAIL.COM'}>
+              <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                 <ShieldCheck className="w-8 h-8 text-primary" />
+              </div>
+              <h3 className="text-xl font-black uppercase mb-4">Email Support</h3>
+              <a href="mailto:KLGADJENIX@GMAIL.COM" className="text-lg font-black hover:text-primary transition-colors break-all">KLGADJENIX@GMAIL.COM</a>
+              <p className="text-xs text-slate-400 mt-4 uppercase font-bold tracking-widest">24/7 Ticketing</p>
+           </div>
+        </div>
+      </section>
     </div>
   );
 }

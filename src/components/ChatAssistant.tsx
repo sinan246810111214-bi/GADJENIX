@@ -104,6 +104,17 @@ export default function ChatAssistant() {
                     </div>
                   </div>
                 )}
+                <div className="pt-4 border-t border-white/5">
+                   <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-black mb-3 text-center">Direct Human Support</p>
+                   <a 
+                    href="https://wa.me/918590181381" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2 w-full py-4 bg-green-500 hover:bg-green-600 text-white rounded-2xl font-black text-xs transition-all shadow-xl shadow-green-500/20"
+                   >
+                     <MessageCircle className="w-4 h-4" /> WHATSAPP CUSTOMER CARE
+                   </a>
+                </div>
               </div>
 
               {/* Input */}

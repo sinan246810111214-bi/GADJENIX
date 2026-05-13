@@ -181,6 +181,7 @@ const Navbar = () => {
           <nav className="hidden lg:flex items-center gap-8 mr-4 text-sm font-semibold text-muted-foreground">
             <Link to="/products" className="hover:text-primary transition-colors">Products</Link>
             <Link to="/compare" className="hover:text-primary transition-colors">Compare</Link>
+            <a href="https://wa.me/918590181381" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">Support</a>
           </nav>
 
           <div className="flex items-center gap-2">
@@ -284,11 +285,19 @@ const Footer = () => (
 
       <div className="md:col-span-2">
         <h4 className="font-bold mb-6 text-sm uppercase tracking-widest text-primary">Support</h4>
-        <ul className="space-y-3 text-sm text-gray-400">
-          <li><Link to="/" className="hover:text-white transition-colors">Help Center</Link></li>
-          <li><Link to="/" className="hover:text-white transition-colors">Shipping info</Link></li>
-          <li><Link to="/" className="hover:text-white transition-colors">Returns</Link></li>
-          <li><Link to="/" className="hover:text-white transition-colors">Warranty</Link></li>
+        <ul className="space-y-4 text-sm text-gray-400">
+          <li className="flex flex-col gap-1">
+            <span className="text-[10px] text-gray-500 uppercase font-black">Call Us</span>
+            <a href="tel:+918714756560" className="hover:text-white transition-colors font-bold">+91 87147 56560</a>
+          </li>
+          <li className="flex flex-col gap-1">
+            <span className="text-[10px] text-gray-500 uppercase font-black">WhatsApp</span>
+            <a href="https://wa.me/918590181381" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors font-bold text-green-500">8590181381</a>
+          </li>
+          <li className="flex flex-col gap-1">
+            <span className="text-[10px] text-gray-500 uppercase font-black">Email</span>
+            <a href="mailto:KLGADJENIX@GMAIL.COM" className="hover:text-white transition-colors font-bold break-all">KLGADJENIX@GMAIL.COM</a>
+          </li>
         </ul>
       </div>
 
@@ -304,6 +313,7 @@ const Footer = () => (
     <div className="max-w-[1500px] mx-auto px-4 md:px-8 border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-500 font-medium">
       <p>© 2026 GADGENIX TECHNOLOGY CO. ALL RIGHTS RESERVED.</p>
       <div className="flex gap-8">
+         <Link to="/admin" className="hover:text-white transition-colors opacity-10 hover:opacity-100">Node Access</Link>
          <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
          <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
       </div>
@@ -311,27 +321,30 @@ const Footer = () => (
   </footer>
 );
 
-export default function App() {
+const AdminShortcut = () => {
   const [keySequence, setKeySequence] = useState('');
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Ignore if user is typing in an input or textarea
       const activeElement = document.activeElement;
       const isInput = activeElement?.tagName === 'INPUT' || activeElement?.tagName === 'TEXTAREA';
       if (isInput) return;
 
-      const newSequence = (keySequence + e.key.toLowerCase()).slice(-8);
+      const newSequence = (keySequence + e.key.toLowerCase()).slice(-20);
       setKeySequence(newSequence);
 
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
       timeoutRef.current = setTimeout(() => {
         setKeySequence('');
-      }, 2000);
+      }, 3000);
 
-      if (newSequence === 'gadjenix') {
-        window.location.href = '/admin/login';
+      // Check for 'admin' or 'gadjenix' at the end of the sequence
+      if (newSequence.endsWith('gadjenix') || newSequence.endsWith('admin')) {
+        toast.info("Admin Access Protocol Initialized");
+        navigate('/admin/login');
+        setKeySequence('');
       }
     };
 
@@ -340,12 +353,17 @@ export default function App() {
       window.removeEventListener('keydown', handleKeyDown);
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
-  }, [keySequence]);
+  }, [keySequence, navigate]);
 
+  return null;
+};
+
+export default function App() {
   return (
     <Router>
       <div className="min-h-screen bg-background text-foreground selection:bg-primary/30">
         <Navbar />
+        <AdminShortcut />
         <main className="max-w-[1500px] mx-auto">
           <AnimatePresence mode="wait">
              <Routes>
